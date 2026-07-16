@@ -1,0 +1,12 @@
+{
+  "required": false,
+  "package": "org.vmstudio.visor.compatibility.dh.mixin",
+  "plugin": "org.vmstudio.visor.MixinConfig",
+  "compatibilityLevel": "JAVA_21",
+  "server": [
+  ],
+  "minVersion": "0.8.4",
+  "client": [
+    "DhClientApiVRMixin"
+  ]
+}

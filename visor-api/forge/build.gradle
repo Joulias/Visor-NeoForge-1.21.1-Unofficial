@@ -1,0 +1,105 @@
+plugins {
+    id "maven-publish"
+    alias(libs.plugins.shadow)
+}
+
+architectury {
+    platformSetupLoomIde()
+    neoForge {
+        platformPackage = "forge"
+    }
+}
+loom {
+    accessWidenerPath = project(":visor-api").file("src/main/resources/visor.accesswidener")
+}
+
+configurations {
+    common
+    shadowCommon // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
+    bundle {
+        // bundle command, to copy jar contents with the shadow plugin
+        canBeResolved = true
+        canBeConsumed = false
+    }
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentNeoForge.extendsFrom common
+}
+
+version = version+"-api_neoforge"
+
+dependencies {
+
+    shadowCommon(project(path: ":visor-api", configuration: "namedElements")) { transitive = false }
+    common(project(path: ":visor-api", configuration: "namedElements")) { transitive false }
+
+
+    //
+    neoForge "net.neoforged:neoforge:${libs.versions.neoforgeVersion.get()}"
+    //mixin extras
+    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:${libs.versions.mixinExtras.get()}"))
+
+
+    // ---- LOCAL DEPENDENCY
+    //shadowCommon(modApi(name: 'atumvr-api-1.13.0beta-snapshot#1')) { transitive = false }
+    //shadowCommon(modApi(name: 'atumvr-core-1.13.0beta-snapshot#1')) { transitive = false }
+    // ----
+    shadowCommon(libs.atumvr.api) { transitive = false }
+    shadowCommon(libs.atumvr.core) { transitive = false }
+    shadowCommon(libs.atumvr.config)
+
+
+}
+
+processResources {
+    inputs.property "version", parent.version
+
+    filesMatching("META-INF/neoforge.mods.toml") {
+        expand "version": parent.version
+    }
+}
+
+shadowJar {
+    exclude "architectury.common.json"
+    exclude "org.joml"
+    exclude "org.lwjgl"
+    exclude "org.slf4j"
+    duplicatesStrategy DuplicatesStrategy.EXCLUDE
+    configurations = [
+            project.configurations.shadowCommon,
+            project.configurations.bundle
+    ]
+    archiveClassifier.set("dev")
+
+    relocate("org.yaml","${project.group}.libs.org.yaml")
+    relocate("org.tomlj","${project.group}.libs.org.tomlj")
+    relocate("org.checkerframework","${project.group}.libs.org.checkerframework")
+    relocate("org.antlr","${project.group}.libs.org.antlr")
+
+    relocate("com.google.gson","${project.group}.libs.com.google.gson")
+    relocate("redempt.crunch","${project.group}.libs.redempt.crunch")
+
+
+
+}
+
+remapJar {
+    input.set shadowJar.archiveFile
+    dependsOn shadowJar
+    archiveClassifier.set('')
+    atAccessWideners.add("visor.accesswidener")
+}
+
+sourcesJar {
+    def apiSources = project(":visor-api").sourcesJar
+    dependsOn apiSources
+    from apiSources.archiveFile.map { zipTree(it) }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}

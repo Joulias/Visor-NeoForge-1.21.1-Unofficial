@@ -1,0 +1,34 @@
+architectury {
+
+    common(rootProject.enabled_platforms.split(","))
+}
+
+loom{
+    accessWidenerPath = project(":visor-api").file("src/main/resources/visor.accesswidener")
+}
+
+dependencies {
+    compileOnly(project(path: ':visor-api', configuration: 'namedElements'))
+
+    compileOnly(project(path: ':visor-core:stubs', configuration: 'namedElements'))
+
+    // Match the Mixin implementation declared by NeoForge 21.1.234 without
+    // relying on Fabric Loader to provide its compile-time annotations.
+    compileOnly(libs.mixin)
+    annotationProcessor(libs.mixin)
+    compileOnly(annotationProcessor(
+            "io.github.llamalad7:mixinextras-common:${libs.versions.mixinExtras.get()}"
+    ))
+    annotationProcessor("org.ow2.asm:asm-util:9.6")
+
+    // ---- LOCAL DEPENDENCY
+    //modApi name: 'atumvr-core-1.13.0beta-snapshot#1'
+    // ----
+    api(libs.atumvr.core)
+
+    //Other mods
+    modCompileOnly(libs.mod.sodium) { transitive = false }
+    modCompileOnly(libs.mod.iris) { transitive = false }
+
+
+}

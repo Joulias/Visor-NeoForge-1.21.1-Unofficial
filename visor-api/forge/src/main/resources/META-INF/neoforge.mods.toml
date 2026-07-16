@@ -1,0 +1,14 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+license = "LGPLv3"
+
+[[mods]]
+modId = "visor"
+version = "${version}"
+displayName = "Visor API (Unofficial NeoForge Port)"
+authors = "Joulias (unofficial NeoForge port); PhoenixRa (original Visor)"
+credits = "Original Visor project by PhoenixRa and VisorModStudio contributors"
+description = '''
+API artifact for the unofficial, community-maintained NeoForge 1.21.1 port of
+Visor 0.4.0. Not a standalone mod; use it as a development dependency.
+'''

@@ -1,0 +1,20 @@
+architectury {
+
+    common(rootProject.enabled_platforms.split(","))
+}
+loom{
+    accessWidenerPath = file("src/main/resources/visor.accesswidener")
+}
+dependencies {
+    // @Environment annotation and mixin extras
+    // ---- LOCAL DEPENDENCY
+    //modApi name: 'atumvr-api-1.13.0beta-snapshot#1'
+    //modApi name: 'atumvr-core-1.13.0beta-snapshot#1'
+    // ----
+    api(libs.atumvr.api)
+    api(libs.atumvr.core)
+    api(libs.atumvr.config)
+
+    compileOnly(libs.bundles.annotations)
+    annotationProcessor(libs.bundles.annotations)
+}

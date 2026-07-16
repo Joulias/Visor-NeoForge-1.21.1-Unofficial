@@ -1,0 +1,72 @@
+# Gradle and generated build output
+.gradle/
+build/
+**/build/
+!.gitignore
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Architectury, Loom, and Mixin generated state
+.architectury-transformer/
+**/.architectury-transformer/
+**/.mixin.out/
+
+# Local development/runtime data
+**/run/
+**/logs/
+**/crash-reports/
+**/saves/
+**/downloads/
+**/usercache.json
+**/usernamecache.json
+**/options.txt
+**/servers.dat
+
+# Private build archives and distributable binaries
+/build-backups/
+/release/
+/*.jar
+**/libs/*.jar
+
+# Independent addon workspaces are intentionally out of scope for the core repo
+/addons/
+
+# Local audit scratch data
+/.audit/
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+# Eclipse
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# VS Code
+.vscode/
+
+# Operating-system files
+.DS_Store
+Thumbs.db
+Desktop.ini

@@ -1,0 +1,16 @@
+{
+  "required": false,
+  "package": "org.vmstudio.visor.compatibility.sodium.mixin",
+  "plugin": "org.vmstudio.visor.MixinConfig",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "ModelCuboidMixin",
+    "caffeinemc.EntityRendererMixin",
+    "SodiumWorldRendererMixin"
+  ],
+  "server": [
+  ],
+  "minVersion": "0.8.4",
+  "mixins": [
+  ]
+}
