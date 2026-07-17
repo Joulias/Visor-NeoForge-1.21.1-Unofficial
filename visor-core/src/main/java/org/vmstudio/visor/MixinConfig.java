@@ -5,7 +5,6 @@ import org.objectweb.asm.tree.AnnotationNode;
 import org.vmstudio.visor.compatibility.ClassDependentMixin;
 import org.vmstudio.visor.compatibility.FieldDependentMixin;
 import org.vmstudio.visor.compatibility.MethodDependentMixin;
-import org.vmstudio.visor.compatibility.sodium.SodiumHelper;
 import org.objectweb.asm.tree.ClassNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +62,11 @@ public class MixinConfig implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
+        if (!MixinModLoader.get().isModLoaded(MixinModLoader.MOD_ID)) {
+            LOGGER.info("Visor failed to load, canceled applying mixin '{}'", mixinClassName);
+            return false;
+        }
+
         try {
             ClassNode mixinClass = MixinService.getService().getBytecodeProvider().getClassNode(mixinClassName);
             if (mixinClass.visibleAnnotations != null) {
@@ -111,7 +115,7 @@ public class MixinConfig implements IMixinConfigPlugin {
 
 
         if(mixinClassName.contains("NoSodium")
-                && SodiumHelper.isLoaded()){
+                && MixinModLoader.get().isSodiumLoaded()){
             return false;
         }
 
