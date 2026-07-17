@@ -12,20 +12,17 @@ import org.vmstudio.visor.api.client.render.decoration.annotations.RegisterVRHan
 import org.vmstudio.visor.api.client.render.decoration.effects.VRHandEffect;
 import org.vmstudio.visor.api.common.HandType;
 import org.vmstudio.visor.api.common.addon.VisorAddon;
-import org.vmstudio.visor.compatibility.ShadersHelper;
 import org.vmstudio.visor.core.client.ClientContext;
 import org.vmstudio.visor.extensions.client.render.GameRendererExtension;
 import org.vmstudio.visor.core.client.render.helpers.RenderPoseHelper;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
@@ -62,13 +59,12 @@ public class HandEffectCrosshair extends VRHandEffect {
         float worldScale = (float)Math.sqrt(pose.getWorldScale());
         float scale = BASE_SCALE * worldScale;
 
-        // nudge back for correct lighting
+        // Nudge the crosshair slightly toward the controller to avoid z-fighting.
         var crossPos = rawCross.add(aim.normalize().mul(LIGHT_OFFSET));
 
         float baseBrightness = (MC.hitResult == null || MC.hitResult.getType() == HitResult.Type.MISS)
                 ? MISS_BRIGHTNESS
                 : FULL_BRIGHTNESS;
-        float brightness = getBrightness(crossPos) * baseBrightness;
 
         // --- GL setup ---
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
@@ -106,23 +102,24 @@ public class HandEffectCrosshair extends VRHandEffect {
         BufferBuilder buf = Tesselator.getInstance()
                 .begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.NEW_ENTITY);
         Matrix4f mat = poseStack.last().pose();
-        int light = LevelRenderer.getLightColor(MC.level, BlockPos.containing(new Vec3(crossPos)));
+        // Invert blending needs an unlit source; local light can reduce it to an invisible no-op.
+        int light = LightTexture.FULL_BRIGHT;
 
         buf.addVertex(mat, -1f, 1f, 0f)
                 .setUv(crosshairSprite.getU1(), crosshairSprite.getV0())
-                .setColor(brightness, brightness, brightness, 1f)
+                .setColor(baseBrightness, baseBrightness, baseBrightness, 1f)
                 .setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(0f, 0f, 1f);
         buf.addVertex(mat, 1f, 1f, 0f)
                 .setUv(crosshairSprite.getU0(), crosshairSprite.getV0())
-                .setColor(brightness, brightness, brightness, 1f)
+                .setColor(baseBrightness, baseBrightness, baseBrightness, 1f)
                 .setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(0f, 0f, 1f);
         buf.addVertex(mat, 1f, -1f, 0f)
                 .setUv(crosshairSprite.getU0(), crosshairSprite.getV1())
-                .setColor(brightness, brightness, brightness, 1f)
+                .setColor(baseBrightness, baseBrightness, baseBrightness, 1f)
                 .setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(0f, 0f, 1f);
         buf.addVertex(mat, -1f, -1f, 0f)
                 .setUv(crosshairSprite.getU1(), crosshairSprite.getV1())
-                .setColor(brightness, brightness, brightness, 1f)
+                .setColor(baseBrightness, baseBrightness, baseBrightness, 1f)
                 .setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(0f, 0f, 1f);
 
         BufferUploader.drawWithShader(buf.buildOrThrow());
@@ -164,16 +161,6 @@ public class HandEffectCrosshair extends VRHandEffect {
         pose.mulPose(new Quaternionf(new AxisAngle4f(
                 angle * Mth.DEG_TO_RAD, x, y, z
         )));
-    }
-
-    private float getBrightness(Vector3f crossPos) {
-        if (MC.level == null) return 1.0f; // how you can get this? idk, just notnull check for myself =)
-
-        float rawLight = MC.level.getMaxLocalRawBrightness(
-                BlockPos.containing(new Vec3(crossPos))
-        );
-        float light =Math.max(rawLight, ShadersHelper.shaderLight());
-        return light / (float) MC.level.getMaxLightLevel();
     }
 
     @Override
