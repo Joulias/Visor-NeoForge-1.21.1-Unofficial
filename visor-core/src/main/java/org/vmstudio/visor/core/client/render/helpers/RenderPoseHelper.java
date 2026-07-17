@@ -66,8 +66,8 @@ public class RenderPoseHelper {
             return;
         }
         LocalPlayerPose renderPose = ClientContext.localPlayer.getPoseData(PlayerPoseType.RENDER);
-        var eyePos = renderPose.getCameraPose(renderPass).getPosition();
-        var hmdOrigin = renderPose.getHmd().getPosition();
+        var eyePos = renderPose.getCameraPose(renderPass).getRelativePosition();
+        var hmdOrigin = renderPose.getHmd().getRelativePosition();
         var offset = eyePos.sub(hmdOrigin, new Vector3f());
 
         poseStack.translate(-offset.x, -offset.y, -offset.z);
@@ -78,8 +78,19 @@ public class RenderPoseHelper {
     public static void applyHandPose(HandType hand,
                                      PoseStack poseStack) {
         LocalPlayerPose renderPose = ClientContext.localPlayer.getPoseData(PlayerPoseType.RENDER);
-        Vector3fc cameraPos = getCameraPosition(VRRenderState.getRenderPass(), renderPose);
-        applyHandPose(renderPose, hand, cameraPos, poseStack);
+        var handPose = renderPose.getBody().getHand(hand).getPose();
+        Vector3fc cameraPos = getCameraRelativePosition(VRRenderState.getRenderPass(), renderPose);
+        var relative = handPose.getRelativePosition().sub(cameraPos, new Vector3f());
+        poseStack.translate(relative.x, relative.y, relative.z);
+
+        Matrix4f invRot = handPose
+                .getRotation()
+                .invert(new Matrix4f())
+                .transpose(new Matrix4f());
+        poseStack.last().pose().mul(invRot);
+
+        float s = renderPose.getWorldScale();
+        poseStack.scale(s, s, s);
     }
 
     public static void applyHandPose(VRPlayerPoseClient renderPose,
@@ -123,6 +134,25 @@ public class RenderPoseHelper {
         }
 
         return vrPose.getCameraPose(renderPass).getPosition();
+    }
+
+    public static Vector3fc getCameraRelativePosition(VRRenderPass renderPass,
+                                                      VRPlayerPoseClient vrPose) {
+        float mirrorSmooth = VRClientSettings.getMirrorSmooth();
+
+        boolean smooth = renderPass == VRRenderPass.CENTER && mirrorSmooth > 0f;
+        if (smooth) {
+            var avg = ClientContext.rawPoseHandler
+                    .getHmdData()
+                    .getPositionHistory()
+                    .averagePosition(mirrorSmooth);
+
+            return avg
+                    .mul(vrPose.getWorldScale())
+                    .rotateY(vrPose.getRotationY());
+        }
+
+        return vrPose.getCameraPose(renderPass).getRelativePosition();
     }
 
 

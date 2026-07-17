@@ -28,7 +28,9 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = 'Visor'
-include 'visor-core','visor-forge','visor-api'
+include 'visor-core','visor-fabric','visor-forge','visor-api'
+include 'visor-api:fabric'
+findProject(':visor-api:fabric')?.name = 'fabric'
 include 'visor-api:forge'
 findProject(':visor-api:forge')?.name = 'forge'
 include 'visor-core:stubs'

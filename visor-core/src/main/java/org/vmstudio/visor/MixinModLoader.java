@@ -27,7 +27,8 @@ public interface MixinModLoader {
     }
 
     enum LoaderType {
-        NEOFORGE
+        NEOFORGE,
+        FABRIC
     }
 
     @ApiStatus.Internal
@@ -50,7 +51,15 @@ public interface MixinModLoader {
             }
 
             if (api == null) {
-                throw new RuntimeException("NEOFORGE MIXIN MOD LOADER FOR VISOR NOT FOUND!");
+                try {
+                    Class<?> clazz = Class.forName("org.vmstudio.visor.loader.fabric.FabricMixinModLoader");
+                    api = (MixinModLoader) clazz.getConstructor().newInstance();
+                } catch (Exception ignored) {
+                }
+            }
+
+            if (api == null) {
+                throw new RuntimeException("SUPPORTED MIXIN MOD LOADER FOR VISOR NOT FOUND!");
             }
             return api;
         }
