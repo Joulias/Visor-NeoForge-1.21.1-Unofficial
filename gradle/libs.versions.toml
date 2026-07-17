@@ -19,7 +19,11 @@ lwjgl                  = "3.3.3"
 atum-vr                = "1.13.0beta"
 atum-config            = '1.2.0pre2'
 
-mixinExtras            = "0.5.3"
+#Fabric
+architectury-lib       = "13.0.8"
+fabric_loader          = "0.18.4"
+fabric_api             = "0.116.13"
+mixinExtras            = "0.4.1"
 mixin                  = "0.15.2+mixin.0.8.7"
 
 # NeoForge
@@ -40,6 +44,9 @@ shadow               = { id = "com.github.johnrengelman.shadow",  version.ref = 
 [libraries]
 
 # Annotations
+architectury-lib   = {module = "dev.architectury:architectury-fabric", version.ref = "architectury-lib"}
+fabric-loader = { module = "net.fabricmc:fabric-loader", version.ref = "fabric_loader" }
+fabric-api    = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric_api" }
 lombok           = { module = "org.projectlombok:lombok",           version.ref = "lombok" }
 jetbrains        = { module = "org.jetbrains:annotations",         version.ref = "jetbrains" }
 mixin             = { module = "net.fabricmc:sponge-mixin",         version.ref = "mixin" }

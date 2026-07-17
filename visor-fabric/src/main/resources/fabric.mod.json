@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "visor",
+  "version": "${version}",
+
+  "name": "Visor",
+  "description": "The VR mod that is built to support addons",
+  "authors": [
+    "PhoenixRa"
+  ],
+  "icon": "assets/visor/icon.png",
+  "license": "LGPLv3",
+  "environment": "*",
+  "entrypoints": {
+    "mm:early_risers": [
+      "org.vmstudio.visor.loader.fabric.VisorEarlyEntry"
+    ],
+    "main": [
+      "org.vmstudio.visor.loader.fabric.VisorMod"
+    ]
+  },
+  "mixins": [
+    "visor.mixins.json",
+    "visor.sodium.mixins.json",
+    "visor.replaymod.mixins.json",
+    "visor.flashback.mixins.json",
+    "visor.mixins.fabric.json",
+    "visor.dh.mixins.json",
+    "visor.iris.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.14",
+    "minecraft": ["1.21", "1.21.1"],
+    "java": ">=17"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}

@@ -150,7 +150,8 @@ public interface ModLoader {
 
 
     enum LoaderType{
-        NEOFORGE
+        NEOFORGE,
+        FABRIC
     }
 
     @ApiStatus.Internal
@@ -166,14 +167,24 @@ public interface ModLoader {
                 return api;
             }
 
+            //FORGE
             try {
                 Class<?> clazz = Class.forName("org.vmstudio.visor.loader.forge.ForgeModLoader");
                 api = (ModLoader) clazz.getConstructor().newInstance();
             } catch (Exception ignored) {
             }
+            //FABRIC
+            if(api == null){
+                try {
+                    Class<?> clazz = Class.forName("org.vmstudio.visor.loader.fabric.FabricModLoader");
+                    api = (ModLoader) clazz.getConstructor().newInstance();
+                } catch (Exception ignored) {
+                }
+            }
 
             if(api == null){
-                throw new RuntimeException("NEOFORGE MOD LOADER FOR VISOR NOT FOUND!");
+                throw new RuntimeException("SUPPORTED MOD LOADER FOR" +
+                        " VISOR NOT FOUND!");
             }
             return api;
         }
