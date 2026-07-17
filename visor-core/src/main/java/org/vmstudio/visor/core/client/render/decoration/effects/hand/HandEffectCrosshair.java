@@ -170,6 +170,14 @@ public class HandEffectCrosshair extends VRHandEffect {
         if(guiHand){
             return false;
         }
+        // A carried menu stack can briefly outlive the GUI-hand state while
+        // cursor focus moves between inventory overlays. Keep the world
+        // crosshair completely out of that drag/drop transition.
+        if (MC.player != null
+                && MC.player.containerMenu != null
+                && !MC.player.containerMenu.getCarried().isEmpty()) {
+            return false;
+        }
         if(hand != ClientContext.localPlayer.getActiveHand()){
             return false;
         }

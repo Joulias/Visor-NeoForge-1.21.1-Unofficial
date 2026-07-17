@@ -2,7 +2,10 @@ package org.vmstudio.visor.core.client.input.mouse;
 
 import lombok.Setter;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.item.ItemStack;
 import org.vmstudio.visor.api.client.ClientFeature;
 import org.vmstudio.visor.api.client.gui.overlays.VROverlay;
 import org.vmstudio.visor.api.client.gui.overlays.framework.VROverlayScreen;
@@ -359,6 +362,10 @@ public class MouseClickHandler {
     }
 
     private boolean processGame(@NotNull HandType handType) {
+        if (dropCarriedStackOutsideInventory()) {
+            return true;
+        }
+
         // update active hand if only one hand is pressed
         var activeHand = ClientContext.localPlayer.getActiveHand();
         if (activeHand != handType) {
@@ -378,6 +385,46 @@ public class MouseClickHandler {
         }
         InputHelper.pressMouse(buttonType);
         gamePressed = true;
+        return true;
+    }
+
+    // Inventory overlays can briefly lose focus while moving a carried stack
+    // to their outside drop target. Preserve vanilla outside-click semantics.
+    private boolean dropCarriedStackOutsideInventory() {
+        if (MC.player == null || MC.gameMode == null) {
+            return false;
+        }
+        if (buttonType != MouseButtonType.LEFT
+                && buttonType != MouseButtonType.RIGHT) {
+            return false;
+        }
+
+        AbstractContainerMenu menu = MC.player.containerMenu;
+        if (menu == null || menu.getCarried().isEmpty()) {
+            return false;
+        }
+
+        if (menu instanceof CreativeModeInventoryScreen.ItemPickerMenu itemPickerMenu) {
+            ItemStack carried = itemPickerMenu.getCarried();
+            if (buttonType == MouseButtonType.LEFT) {
+                MC.player.drop(carried, true);
+                MC.gameMode.handleCreativeModeItemDrop(carried);
+                itemPickerMenu.setCarried(ItemStack.EMPTY);
+            } else {
+                ItemStack singleItem = carried.split(1);
+                MC.player.drop(singleItem, true);
+                MC.gameMode.handleCreativeModeItemDrop(singleItem);
+            }
+            return true;
+        }
+
+        MC.gameMode.handleInventoryMouseClick(
+                menu.containerId,
+                -999,
+                buttonType.getId(),
+                ClickType.PICKUP,
+                MC.player
+        );
         return true;
     }
 }
