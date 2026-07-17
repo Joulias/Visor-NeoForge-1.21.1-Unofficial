@@ -15,6 +15,12 @@
   "entrypoints": {
     "main": [
       "org.vmstudio.visor.loader.fabric.VisorMod"
+    ],
+    "client": [
+      "org.vmstudio.visor.loader.fabric.VisorClientMod"
+    ],
+    "server": [
+      "org.vmstudio.visor.loader.fabric.VisorDedicatedServerMod"
     ]
   },
   "mixins": [

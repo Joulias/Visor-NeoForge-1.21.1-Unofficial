@@ -18,7 +18,7 @@ configurations {
     runtimeClasspath.extendsFrom common
     developmentFabric.extendsFrom common
 }
-version = version+"-fabric"
+version = "${rootProject.version}-Fabric-${libs.versions.minecraftVersion.get()}-Unofficial"
 dependencies {
     common(project(path: ':visor-api', configuration: 'namedElements')) { transitive = false }
 
