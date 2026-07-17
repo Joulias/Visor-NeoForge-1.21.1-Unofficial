@@ -5,7 +5,7 @@ license = "LGPLv3"
 [[mods]]
 modId = "visor"
 version = "${version}"
-displayName = "Visor (Unofficial NeoForge Release)"
+displayName = "Visor 0.4.0 + Sable Compatibility Fix (Unofficial NeoForge)"
 logoFile = "assets/visor/icon.png"
 authors = "Joulias (unofficial NeoForge port)"
 credits = "Unofficial NeoForge port by Joulias; original Visor project by PhoenixRa and VisorModStudio contributors"
